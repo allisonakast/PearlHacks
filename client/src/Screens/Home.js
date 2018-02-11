@@ -28,6 +28,8 @@ import { DrawerNavigator, NavigationActions, StackNavigator } from 'react-naviga
 import { API, Storage } from 'aws-amplify';
 import AddPet from './AddPet';
 import ViewPet from './ViewPet';
+import SwipeCards from './SwipeCards.js';
+import Matches from './Matches.js';
 import UploadPhoto from '../Components/UploadPhoto';
 import SideMenuIcon from '../Components/SideMenuIcon';
 import awsmobile from '../aws-exports';
@@ -40,6 +42,8 @@ class Home extends React.Component {
     super(props);
 
     this.handleRetrievePet = this.handleRetrievePet.bind(this);
+    this.handleRetrieveCard = this.handleRetrieveCard.bind(this);
+
     this.animate = this.animate.bind(this);
     this.toggleModal = this.toggleModal.bind(this);
 
@@ -72,6 +76,26 @@ class Home extends React.Component {
 
   handleRetrievePet() {
     API.get('Pets', '/items/pets').then(apiResponse => {
+      return Promise.all(apiResponse.map(async (pet) => {
+        // Make "key" work with paths like:
+        // "private/us-east-1:7817b8c7-2a90-4735-90d4-9356d7f8f0c7/091357f0-f0bc-11e7-a6a2-937d1d45b80e.jpeg"
+        // and
+        // "44b223e0-9707-11e7-a7d2-cdc5b84df56b.jpeg"
+        const [, , , key] = /(([^\/]+\/){2})?(.+)$/.exec(pet.picKey);
+
+        const picUrl = pet.picKey && await Storage.get(key, { level: 'private' });
+
+        return { ...pet, picUrl };
+      }));
+    }).then(apiResponse => {
+      this.setState({ apiResponse, loading: false });
+    }).catch(e => {
+      this.setState({ apiResponse: e.message, loading: false });
+    });
+  }
+
+  handleRetrieveCard() {
+    API.get('Card', '/items/cards').then(apiResponse => {
       return Promise.all(apiResponse.map(async (pet) => {
         // Make "key" work with paths like:
         // "private/us-east-1:7817b8c7-2a90-4735-90d4-9356d7f8f0c7/091357f0-f0bc-11e7-a6a2-937d1d45b80e.jpeg"
@@ -135,44 +159,12 @@ class Home extends React.Component {
 
     const AddPetRoutes = StackNavigator({
       AddPet: { screen: AddPet },
-      UploadPhoto: { screen: UploadPhoto },
+      UploadPhoto: { screen: UploadPhoto }
     });
 
     return (
-      <View style={[{ flex: 1 }]}>
-        {!loading && <View style={{ position: 'absolute', bottom: 25, right: 25, zIndex: 1 }}>
-          <Icon
-            onPress={this.toggleModal}
-            raised
-            reverse
-            name='add'
-            size={44}
-            containerStyle={{ width: 50, height: 50 }}
-            color={colors.primary}
-          />
-        </View>}
-        <ScrollView style={[{ flex: 1, zIndex: 0 }]} contentContainerStyle={[loading && { justifyContent: 'center', alignItems: 'center' }]}>
-          {loading && <Animated.View style={{ transform: [{ rotate: spin }] }}><Icon name='autorenew' color={colors.grayIcon} /></Animated.View>}
-          {
-            !loading &&
-            <View style={styles.container}>
-              <Text style={styles.title}>My Pets</Text>
-              {
-                typeof apiResponse === 'string' ?
-                  <Text>{apiResponse}</Text> :
-                  apiResponse.map((pet, index) => this.renderPet(pet, index))
-              }
-            </View>
-          }
-        </ScrollView>
-        <Modal
-          animationType={"slide"}
-          transparent={false}
-          visible={this.state.modalVisible}
-          onRequestClose={this.toggleModal}
-        >
-          <AddPetRoutes screenProps={{ handleRetrievePet: this.handleRetrievePet, toggleModal: this.toggleModal }} />
-        </Modal>
+      <View style={{ flex: 1 }}>
+        <SwipeCards style={{ width: '100%', height: '100%' }} />
       </View >
     );
   }
@@ -216,6 +208,7 @@ const HomeRouteStack = {
       return {
         title: 'Home',
         headerLeft: <SideMenuIcon onPress={() => props.screenProps.rootNavigator.navigate('DrawerOpen')} />,
+        headerRight: <Button title="Matches" underlayColor="transparent" onPress={() => StackNavigator({ Matches: { screen: Matches } })} />
       }
     }
   },

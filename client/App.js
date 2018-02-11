@@ -23,12 +23,18 @@ import Splash from './src/Screens/Splash';
 import Home from './src/Screens/Home';
 import SignOut from './src/Components/SignOut';
 import ForgotPassword from './src/Components/ForgotPassword';
+import Profile from './src/Components/Profile'
 
 Amplify.configure(awsmobile);
 
 const App = DrawerNavigator({
   Home: {
     screen: props => <Home rootNavigator={props.navigation} {...props.screenProps } />,
+  },
+  Profile: {
+    screen: (props) => {
+      return <Profile {...props.screenProps} onCancel={() => props.navigate('Home')} onSuccess={() => props.navigation.navigate('Home')} />
+    }, navigationOptions: { drawerLabel: 'Profile' }
   },
   ForgotPassword: {
     screen: (props) => {

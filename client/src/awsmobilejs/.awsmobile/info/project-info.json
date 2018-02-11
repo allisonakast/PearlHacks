@@ -1,0 +1,23 @@
+{
+	"ProjectName": "src",
+	"ProjectPath": "/Users/allisonkast/Projects/aws-mobile-react-native-starter/client/src",
+	"SourceDir": "src",
+	"DistributionDir": "build",
+	"BuildCommand": "npm run-script build",
+	"StartCommand": "npm run-script start",
+	"InitializationTime": "2018-02-10-20-30-36",
+	"LastConfigurationTime": "2018-02-10-20-31-30",
+	"LastNPMInstallTime": "",
+	"FrontendLastBuildTime": "",
+	"LastPublishTime": "",
+	"BackendFormat": "yml",
+	"BackendLastSyncTime": "2018-02-11-00-45-01",
+	"BackendLastBuildTime": "",
+	"BackendLastPushTime": "",
+	"BackendLastPushSuccessful": false,
+	"BackendProjectID": "c5ccd1a6-f4a2-478d-819a-af86c9af2737",
+	"BackendProjectName": "pearl-hacks",
+	"BackendProjectConsoleUrl": "https://console.aws.amazon.com/mobilehub/home#/c5ccd1a6-f4a2-478d-819a-af86c9af2737/build",
+	"BackendProjectCreationTime": "2018-02-11T01:23:15.416Z",
+	"BackendProjectLastUpdatedTime": "2018-02-11T05:43:06.196Z"
+}
